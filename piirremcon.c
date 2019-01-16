@@ -62,7 +62,7 @@ void piir_transmitPatternAEHA(const unsigned char *pat, const int n_bits)
   int us_next;
   int us_next2;
   int i, j, b;
-  const char *p;
+  const unsigned char *p;
   struct timeval tv0;
 
   gettimeofday(&tv0, NULL);
@@ -110,7 +110,7 @@ void piir_transmitPatternSIRC(const unsigned char *pat, const int n_bits)
   int us_next;
   int us_next2;
   int i, j, b;
-  const char *p;
+  const unsigned char *p;
   struct timeval tv0;
   
   gettimeofday(&tv0, NULL);
@@ -190,7 +190,7 @@ int piir_initialize(int gpio_led, int pi_type)
   if ((unsigned long) gState.gpio_mem % PAGE_SIZE)
     gState.gpio_mem += PAGE_SIZE - ((unsigned long) gState.gpio_mem % PAGE_SIZE);
   gState.gpio_map = (char*) mmap(
-				 (caddr_t) gState.gpio_mem,
+				 (void*) gState.gpio_mem,
 				 BLOCK_SIZE,
 				 PROT_READ | PROT_WRITE,
 				 MAP_SHARED | MAP_FIXED,
