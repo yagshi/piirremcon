@@ -1,3 +1,3 @@
 CFLAGS = -O
 
-piirremcon:	piirremcon.c piirremcon.h
+piirremcon:	piirremcon.o
