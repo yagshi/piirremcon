@@ -9,8 +9,10 @@
 #include <sys/mman.h>
 #include "piirremcon.h"
 
-#define SUB_CARRIER 38000 /* Hz */
-#define DT_US (1000000 / SUB_CARRIER)
+#define SUB_CARRIER_AEHA 38000 /* Hz */
+#define SUB_CARRIER_SIRC 38000 /* Hz */
+#define DT_US_AEHA (1000000 / SUB_CARRIER_AEHA)
+#define DT_US_SIRC (1000000 / SUB_CARRIER_SIRC)
 #define IR_LED 14   /* GPIO # */
 #define PI2_PERI_BASE 0x3f000000  /* PI2, 3 */
 #define PI1_PERI_BASE 0x20000000  /* PI0, 1 */
@@ -67,18 +69,18 @@ void piir_transmitPatternAEHA(const unsigned char *pat, const int n_bits)
 
   gettimeofday(&tv0, NULL);
   // leader
-  us_next = DT_US;
+  us_next = DT_US_AEHA;
   do {
     GPIO_SET = 1 << gState.led;
     waitUs(tv0, us_next);
-    us_next = us_next + DT_US/2;
+    us_next = us_next + DT_US_AEHA/2;
     GPIO_CLR = 1 << gState.led;
     waitUs(tv0, us_next);
-    us_next = us_next + DT_US/2*3;
-  } while (us_next - DT_US < t_us * 8);
-  us_next = us_next + t_us * 4 - DT_US;
+    us_next = us_next + DT_US_AEHA/2*3;
+  } while (us_next - DT_US_AEHA < t_us * 8);
+  us_next = us_next + t_us * 4 - DT_US_AEHA;
   waitUs(tv0, us_next);
-  us_next = us_next + DT_US;
+  us_next = us_next + DT_US_AEHA;
   // data
   for (i = 0, p = pat; i < (n_bits + 7) / 8; i++, p++) {
     for (b = 1, j = 0; b <= 128 && i * 8 + j < n_bits; b = b << 1, j = j + 1) {
@@ -86,11 +88,11 @@ void piir_transmitPatternAEHA(const unsigned char *pat, const int n_bits)
       do {
 	GPIO_SET = 1 << gState.led;
 	waitUs(tv0, us_next);
-	us_next = us_next + DT_US/2;
+	us_next = us_next + DT_US_AEHA/2;
 	GPIO_CLR = 1 << gState.led;
 	waitUs(tv0, us_next);
-	us_next = us_next + DT_US/2*3;
-      } while (us_next - DT_US < us_next2);
+	us_next = us_next + DT_US_AEHA/2*3;
+      } while (us_next - DT_US_AEHA < us_next2);
       GPIO_CLR = 1 << gState.led;
       if (*p & b) {
 	us_next = us_next + t_us * 3;   // 1 = 3T
@@ -98,7 +100,7 @@ void piir_transmitPatternAEHA(const unsigned char *pat, const int n_bits)
 	us_next = us_next + t_us;       // 0 =  T
       }
       waitUs(tv0, us_next);
-      us_next = us_next + DT_US;
+      us_next = us_next + DT_US_AEHA;
     }
   }
 }
@@ -115,19 +117,19 @@ void piir_transmitPatternSIRC(const unsigned char *pat, const int n_bits)
   
   gettimeofday(&tv0, NULL);
   // leader
-  us_next = DT_US;
+  us_next = DT_US_SIRC;
   do {
     GPIO_SET = 1 << gState.led;
     waitUs(tv0, us_next);
-    us_next = us_next + DT_US / 3;
+    us_next = us_next + DT_US_SIRC / 3;
     GPIO_CLR = 1 << gState.led;
     waitUs(tv0, us_next);
-    us_next = us_next + DT_US / 3 * 2;
-  } while (us_next - DT_US < t_us * 4);
+    us_next = us_next + DT_US_SIRC / 3 * 2;
+  } while (us_next - DT_US_SIRC < t_us * 4);
   // data
   for (i = 0, p = pat; i < (n_bits + 7) / 8; i++, p++) {
     for (b = 1, j = 0; b <= 128 && i * 8 + j < n_bits; b = b << 1, j = j + 1) {
-      us_next = us_next - DT_US + t_us;  // 共通の消灯部分 (T)
+      us_next = us_next - DT_US_SIRC + t_us;  // 共通の消灯部分 (T)
       GPIO_CLR = 1 << gState.led;
       waitUs(tv0, us_next);
       if (*p & b) {
@@ -135,15 +137,15 @@ void piir_transmitPatternSIRC(const unsigned char *pat, const int n_bits)
       } else {
 	us_next2 = us_next + t_us;       // 0 =  T
       }
-      us_next = us_next + DT_US;
+      us_next = us_next + DT_US_SIRC;
       do {
 	GPIO_SET = 1 << gState.led;
 	waitUs(tv0, us_next);
-	us_next = us_next + DT_US / 3;
+	us_next = us_next + DT_US_SIRC / 3;
 	GPIO_CLR = 1 << gState.led;
 	waitUs(tv0, us_next);
-	us_next = us_next + DT_US /3 * 2;
-      } while (us_next - DT_US < us_next2);
+	us_next = us_next + DT_US_SIRC /3 * 2;
+      } while (us_next - DT_US_SIRC < us_next2);
     }
   }
 }
@@ -205,20 +207,49 @@ int piir_initialize(int gpio_led, int pi_type)
   return 0;
 }
 
+int hexval(unsigned char ch) {
+  if (ch >= '0' && ch <= '9') return ch - '0';
+  if (ch >= 'a' && ch <= 'f') return ch - 'a' + 10;
+  if (ch >= 'A' && ch <= 'F') return ch - 'a' + 10;
+  return 0;
+}
+
+// parse hex string
+void parse_hex(unsigned char data[], const char *str, int buf_length) {
+  const char *p;
+  int i;
+  for (p = str, i = 0; i < buf_length && *p && *(p + 1); i++, p += 2) {
+    data[i] = hexval(*p) * 16 + hexval(*(p + 1));
+  }
+}
+
+
 int main(int argc, char *argv[])
 {
   int i, j;
+  unsigned char data[9];
   if (argc < 3) {
     fprintf(stderr,
 	    "usage: piirremcon device command\n"
 	    "example: piirremcon sharptv power\n"
+	    "note: [device] can also be 'AEHA' or 'SIRC' which is followed by length and hex codes.\n"
 	    );
     return -1;
   }
 
   if (piir_initialize(IR_LED, PIIR_TYPE_PI0)) printf("initialization error.\n");
 
-
+  if (strcmp("AEHA", argv[1]) == 0 && argc > 3) {  // direct command
+      parse_hex(data, argv[3], 9);
+      piir_transmitPatternAEHA((const unsigned char *)data, (const int) atoi(argv[2]));
+      usleep(40000);
+      piir_transmitPatternAEHA((const unsigned char *)data, (const int) atoi(argv[2]));
+      usleep(40000);
+      piir_transmitPatternAEHA((const unsigned char *)data, (const int) atoi(argv[2]));
+      usleep(40000);
+      piir_transmitPatternAEHA((const unsigned char *)data, (const int) atoi(argv[2]));
+      return 0;
+  }
   for (i = 0; i < sizeof(PIIR_codedb) / sizeof(struct IRCode); i++) {
     if (strcmp(PIIR_codedb[i].device, argv[1]) == 0 &&
 	strcmp(PIIR_codedb[i].command, argv[2]) == 0) {
