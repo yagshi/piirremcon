@@ -288,7 +288,7 @@ int main(int argc, char *argv[])
   int i, j;
   unsigned char data[9];
   for (i == 1; i < argc; i++) {
-    if (strcmp("--list", argv[i])) {
+    if (strcmp("--list", argv[i]) == 0) {
       for (j = 0; j < sizeof(PIIR_codedb) / sizeof(struct IRCode); j++) {
 	printf("%s %s\n", PIIR_codedb[j].device, PIIR_codedb[j].command);
       }
