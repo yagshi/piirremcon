@@ -226,6 +226,9 @@ void piir_transmit(const struct IRCode code)
       piir_transmitPatternSIRC12(code.data, code.length);
     }
     break;
+  case NEC:
+    piir_transmitPatternNEC(code.data, code.length);
+    break;
   }
 }
       
