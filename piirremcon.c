@@ -287,9 +287,18 @@ int main(int argc, char *argv[])
 {
   int i, j;
   unsigned char data[9];
+  for (i == 1; i < argc; i++) {
+    if (strcmp("--list", argv[i])) {
+      for (j = 0; j < sizeof(PIIR_codedb) / sizeof(struct IRCode); j++) {
+	printf("%s %s\n", PIIR_codedb[j].device, PIIR_codedb[j].command);
+      }
+      return 0;
+    }
+  }
   if (argc < 3) {
     fprintf(stderr,
 	    "usage: piirremcon device command\n"
+	    "       piirremcon --list\n"
 	    "example: piirremcon sharptv power\n"
 	    "note: [device] can also be 'AEHA' or 'SIRC' which is followed by length and hex codes.\n"
 	    );
@@ -298,6 +307,7 @@ int main(int argc, char *argv[])
 
   if (piir_initialize(IR_LED, PIIR_TYPE_PI0)) printf("initialization error.\n");
 
+  
   if (strcmp("AEHA", argv[1]) == 0 && argc > 3) {  // direct command
       parse_hex(data, argv[3], 9);
       piir_transmitPatternAEHA((const unsigned char *)data, (const int) atoi(argv[2]));
