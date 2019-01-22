@@ -10,7 +10,8 @@
 #include "piirremcon.h"
 
 #define SUB_CARRIER_AEHA 38000 /* Hz */
-#define SUB_CARRIER_SIRC 38000 /* Hz */
+#define SUB_CARRIER_NEC  38000 /* Hz */
+#define SUB_CARRIER_SIRC 40000 /* Hz */
 #define DT_US_AEHA (1000000 / SUB_CARRIER_AEHA)
 #define DT_US_SIRC (1000000 / SUB_CARRIER_SIRC)
 #define IR_LED 14   /* GPIO # */
