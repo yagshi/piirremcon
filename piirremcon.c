@@ -13,6 +13,7 @@
 #define SUB_CARRIER_NEC  38000 /* Hz */
 #define SUB_CARRIER_SIRC 40000 /* Hz */
 #define DT_US_AEHA (1000000 / SUB_CARRIER_AEHA)
+#define DT_US_NEC (1000000 / SUB_CARRIER_NEC)
 #define DT_US_SIRC (1000000 / SUB_CARRIER_SIRC)
 #define IR_LED 14   /* GPIO # */
 #define PI2_PERI_BASE 0x3f000000  /* PI2, 3 */
@@ -55,7 +56,7 @@ struct PIIRState {
 /** 
  *  @fn
  *  transmit raw bit pattern on sub carrier. (AEHA format)
- *  @param (pat) bit pattern (MSB is the first bit to be transmitted.)
+ *  @param (pat) bit pattern (LSB is the first bit to be transmitted.)
  *  @param (n_bits) number of bits
  */
 void piir_transmitPatternAEHA(const unsigned char *pat, const int n_bits)
@@ -102,6 +103,60 @@ void piir_transmitPatternAEHA(const unsigned char *pat, const int n_bits)
       }
       waitUs(tv0, us_next);
       us_next = us_next + DT_US_AEHA;
+    }
+  }
+}
+
+/** 
+ *  @fn
+ *  transmit raw bit pattern on sub carrier. (NEC format)
+ *  @param (pat) bit pattern (LSB is the first bit to be transmitted.)
+ *  @param (n_bits) number of bits (normally 33 bit fixed)
+ */
+void piir_transmitPatternNEC(const unsigned char *pat, const int n_bits)
+{
+  int t_us = 562;
+  int us;
+  int us_next;
+  int us_next2;
+  int i, j, b;
+  const unsigned char *p;
+  struct timeval tv0;
+
+  gettimeofday(&tv0, NULL);
+  // leader
+  us_next = DT_US_NEC;
+  do {
+    GPIO_SET = 1 << gState.led;
+    waitUs(tv0, us_next);
+    us_next = us_next + DT_US_NEC/2;
+    GPIO_CLR = 1 << gState.led;
+    waitUs(tv0, us_next);
+    us_next = us_next + DT_US_NEC/2*3;
+  } while (us_next - DT_US_NEC < t_us * 16);
+  us_next = us_next + t_us * 8 - DT_US_NEC;
+  waitUs(tv0, us_next);
+  us_next = us_next + DT_US_NEC;
+  // data
+  for (i = 0, p = pat; i < (n_bits + 7) / 8; i++, p++) {
+    for (b = 1, j = 0; b <= 128 && i * 8 + j < n_bits; b = b << 1, j = j + 1) {
+      us_next2 = us_next + t_us;       // 0 =  T
+      do {
+	GPIO_SET = 1 << gState.led;
+	waitUs(tv0, us_next);
+	us_next = us_next + DT_US_NEC/2;
+	GPIO_CLR = 1 << gState.led;
+	waitUs(tv0, us_next);
+	us_next = us_next + DT_US_NEC/2*3;
+      } while (us_next - DT_US_NEC < us_next2);
+      GPIO_CLR = 1 << gState.led;
+      if (*p & b) {
+	us_next = us_next + t_us * 3;   // 1 = 3T
+      } else {
+	us_next = us_next + t_us;       // 0 =  T
+      }
+      waitUs(tv0, us_next);
+      us_next = us_next + DT_US_NEC;
     }
   }
 }

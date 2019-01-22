@@ -5,7 +5,7 @@
 #define PIIR_TYPE_PI1 1
 #define PIIR_TYPE_PI0 0
 
-enum CODETYPE {AEHA, SIRC};
+enum CODETYPE {AEHA, SIRC, NEC};
 	       
 struct IRCode {
   const enum CODETYPE codetype;
@@ -109,6 +109,7 @@ const struct IRCode PIIR_codedb[] =
    {AEHA, 49, {0xaa, 0x5a, 0x8f, 0x12, 0xdb, 0xf2, 0x01}, "sharptv", "c?"},
    {AEHA, 49, {0xaa, 0x5a, 0x8f, 0x12, 0xe3, 0x71, 0x01}, "sharptv", "videomute"},
    {AEHA, 49, {0xaa, 0x5a, 0xf1, 0x48, 0x68, 0x8b, 0x01}, "sharptv2", "power"},
+   {NEC, 33, {0x83, 0x55, 0x90, 0x6f, 0x01}, "epsonprojector", "power"},
   };
 
 /**
