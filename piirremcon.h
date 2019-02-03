@@ -18,8 +18,11 @@ struct IRCode {
 
 const struct IRCode PIIR_codedb[] =
   {
+   {SIRC, 12, {0x10, 0x01}, "sonytv", "chnext"},
+   {SIRC, 12, {0x11, 0x01}, "sonytv", "chprev"},
    {SIRC, 12, {0x12, 0x01}, "sonytv", "volup"},
    {SIRC, 12, {0x13, 0x01}, "sonytv", "voldown"},
+   {SIRC, 12, {0x14, 0x01}, "sonytv", "mute"},
    {SIRC, 12, {0x15, 0x01}, "sonytv", "power"},
    {AEHA, 49, {0xaa, 0x5a, 0x8f, 0x12, 0x01, 0xb1, 0x01}, "sharptv", "ch1"},
    {AEHA, 49, {0xaa, 0x5a, 0x8f, 0x12, 0x02, 0x81, 0x01}, "sharptv", "ch2"},
