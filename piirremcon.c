@@ -206,14 +206,6 @@ void piir_transmitPatternSIRC(const unsigned char *pat, const int n_bits)
   }
 }
 
-void piir_transmitPatternSIRC12(const unsigned char *pat, const int n_bits)
-{
-  unsigned char pat2[2];
-  int p = pat[0] | (pat[1] << 7);
-  pat2[0] = p & 0xff;
-  pat2[1] = p >> 8;
-  piir_transmitPatternSIRC(pat2, 12);
-}
 
 void piir_transmit(const struct IRCode code)
 {
@@ -222,9 +214,7 @@ void piir_transmit(const struct IRCode code)
     piir_transmitPatternAEHA(code.data, code.length);
     break;
   case SIRC:
-    if (code.length == 12) {
-      piir_transmitPatternSIRC12(code.data, code.length);
-    }
+    piir_transmitPatternSIRC(code.data, code.length);
     break;
   case NEC:
     piir_transmitPatternNEC(code.data, code.length);
