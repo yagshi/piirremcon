@@ -188,11 +188,10 @@ const struct IRCode PIIR_codedb[] =
  */
 int piir_initialize(int gpio, int pi_type);
 
-/**
+/** 
  *  @fn
- *  transmit IR remote commander
- *  @param (cmd) 
+ *  transmit remote command (common for AEHA, SIRC, and NEC)
+ *  @param (code) IR code (struct IRcode).
  */
-//int piir_transmit(char *cmd, char *manufacturer, int n_repeat);
-
+void piir_transmit(const struct IRCode code);
 
