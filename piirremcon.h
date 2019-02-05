@@ -18,23 +18,28 @@ struct IRCode {
 
 const struct IRCode PIIR_codedb[] =
   {
-   {SIRC, 12, {0x10, 0x01}, "sonytv", "chnext"},
-   {SIRC, 12, {0x11, 0x01}, "sonytv", "chprev"},
-   {SIRC, 12, {0x12, 0x01}, "sonytv", "volup"},
-   {SIRC, 12, {0x13, 0x01}, "sonytv", "voldown"},
-   {SIRC, 12, {0x14, 0x01}, "sonytv", "mute"},
-   {SIRC, 12, {0x15, 0x01}, "sonytv", "power"},
+   {SIRC, 12, {0x90, 0x00}, "sonytv", "chnext"},  // cmd=10
+   {SIRC, 12, {0x91, 0x00}, "sonytv", "chprev"},  // cmd=11
+   {SIRC, 12, {0x92, 0x00}, "sonytv", "volup"},   // cmd=12
+   {SIRC, 12, {0x93, 0x00}, "sonytv", "voldown"}, // cmd=13
+   {SIRC, 12, {0x94, 0x00}, "sonytv", "mute"},    // cmd=14
+   {SIRC, 12, {0x95, 0x00}, "sonytv", "power"},   // cmd=15
+   {SIRC, 12, {0xe5, 0x00}, "sonytv", "ok"},      // cmd=65
+   {SIRC, 12, {0xf4, 0x00}, "sonytv", "up"},      // cmd=74
+   {SIRC, 12, {0xf5, 0x00}, "sonytv", "down"},    // cmd=75
+   {SIRC, 12, {0xb3, 0x00}, "sonytv", "right"},   // cmd=33
+   {SIRC, 12, {0xb4, 0x00}, "sonytv", "left"},    // cmd=34
    // Blu-ray player (RMT-VB101J)
-   {SIRC, 20, {0x15, 0x2d, 0x0e}, "sonybd", "power"},
+   {SIRC, 20, {0x15, 0x2d, 0x0e}, "sonybd", "power"}, // cmd=15
    {SIRC, 20, {0x1a, 0x2d, 0x0e}, "sonybd", "play"},
    {SIRC, 20, {0x1a, 0x16, 0x0e}, "sonybd", "eject"},
    {SIRC, 20, {0x1a, 0x18, 0x0e}, "sonybd", "stop"},
    {SIRC, 20, {0x1a, 0x19, 0x0e}, "sonybd", "pause"},
-   {SIRC, 20, {0x39, 0x19, 0x0e}, "sonybd", "up"},
+   {SIRC, 20, {0x39, 0x19, 0x0e}, "sonybd", "up"},    // cmd=13
    {SIRC, 20, {0x3a, 0x19, 0x0e}, "sonybd", "down"},
-   {SIRC, 20, {0x3b, 0x19, 0x0e}, "sonybd", "left"},
+   {SIRC, 20, {0x3b, 0x19, 0x0e}, "sonybd", "left"},  // cmd=3b
    {SIRC, 20, {0x3c, 0x19, 0x0e}, "sonybd", "right"},
-   {SIRC, 20, {0x3d, 0x19, 0x0e}, "sonybd", "ok"},
+   {SIRC, 20, {0x3d, 0x19, 0x0e}, "sonybd", "ok"},    // cmd=3d
    {SIRC, 20, {0x43, 0x19, 0x0e}, "sonybd", "back"},
    {SIRC, 20, {0x56, 0x19, 0x0e}, "sonybd", "next"},
    {SIRC, 20, {0x57, 0x19, 0x0e}, "sonybd", "prev"},
