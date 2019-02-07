@@ -161,6 +161,12 @@ void piir_transmitPatternNEC(const unsigned char *pat, const int n_bits)
   }
 }
 
+/** 
+ *  @fn
+ *  transmit raw bit pattern on sub carrier. (SIRC format)
+ *  @param (pat) bit pattern (LSB is the first bit to be transmitted.)
+ *  @param (n_bits) number of bits
+ */
 void piir_transmitPatternSIRC(const unsigned char *pat, const int n_bits)
 {
   int t_us = 600;
@@ -206,15 +212,12 @@ void piir_transmitPatternSIRC(const unsigned char *pat, const int n_bits)
   }
 }
 
-void piir_transmitPatternSIRC12(const unsigned char *pat, const int n_bits)
-{
-  unsigned char pat2[2];
-  int p = pat[0] | (pat[1] << 7);
-  pat2[0] = p & 0xff;
-  pat2[1] = p >> 8;
-  piir_transmitPatternSIRC(pat2, 12);
-}
 
+/** 
+ *  @fn
+ *  transmit remote command (common for AEHA, SIRC, and NEC)
+ *  @param (code) IR code (struct IRcode). See piirremcon.h
+ */
 void piir_transmit(const struct IRCode code)
 {
   switch (code.codetype) {
@@ -222,9 +225,7 @@ void piir_transmit(const struct IRCode code)
     piir_transmitPatternAEHA(code.data, code.length);
     break;
   case SIRC:
-    if (code.length == 12) {
-      piir_transmitPatternSIRC12(code.data, code.length);
-    }
+    piir_transmitPatternSIRC(code.data, code.length);
     break;
   case NEC:
     piir_transmitPatternNEC(code.data, code.length);
@@ -232,6 +233,12 @@ void piir_transmit(const struct IRCode code)
   }
 }
       
+/** 
+ *  @fn
+ *  hardware initialization. need to be called at first.
+ *  @param (gpio_led) GPIO (BCM number) that is connected to LED
+ *  @param (pi_type)  Raspberry Pi type such as 'PIIR_TYPE_PI3'.
+ */
 int piir_initialize(int gpio_led, int pi_type)
 {
   gState.led = gpio_led;
