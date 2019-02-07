@@ -319,6 +319,10 @@ int main(int argc, char *argv[])
       piir_transmitPatternAEHA((const unsigned char *)data, (const int) atoi(argv[2]));
       return 0;
   }
+  if (strcmp("SIRC", argv[1]) == 0 && argc > 3) { // direct command
+    parse_hex(data, argv[3], 9);
+    piir_transmitPatternSIRC((const unsigned char *)data, (const int) atoi(argv[2]));
+  }
   for (i = 0; i < sizeof(PIIR_codedb) / sizeof(struct IRCode); i++) {
     if (strcmp(PIIR_codedb[i].device, argv[1]) == 0 &&
 	strcmp(PIIR_codedb[i].command, argv[2]) == 0) {
