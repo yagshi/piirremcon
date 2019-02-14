@@ -329,6 +329,11 @@ int main(int argc, char *argv[])
   if (strcmp("SIRC", argv[1]) == 0 && argc > 3) { // direct command
     parse_hex(data, argv[3], 9);
     piir_transmitPatternSIRC((const unsigned char *)data, (const int) atoi(argv[2]));
+    usleep(40000);
+    piir_transmitPatternSIRC((const unsigned char *)data, (const int) atoi(argv[2]));
+    usleep(40000);
+    piir_transmitPatternSIRC((const unsigned char *)data, (const int) atoi(argv[2]));
+    return 0;
   }
   for (i = 0; i < sizeof(PIIR_codedb) / sizeof(struct IRCode); i++) {
     if (strcmp(PIIR_codedb[i].device, argv[1]) == 0 &&
