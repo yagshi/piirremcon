@@ -18,12 +18,26 @@ struct IRCode {
 
 const struct IRCode PIIR_codedb[] =
   {
+   {SIRC, 12, {0x80, 0x00}, "sonytv", "ch1"}, 
+   {SIRC, 12, {0x81, 0x00}, "sonytv", "ch2"}, 
+   {SIRC, 12, {0x82, 0x00}, "sonytv", "ch3"}, 
+   {SIRC, 12, {0x83, 0x00}, "sonytv", "ch4"}, 
+   {SIRC, 12, {0x84, 0x00}, "sonytv", "ch5"}, 
+   {SIRC, 12, {0x85, 0x00}, "sonytv", "ch6"}, 
+   {SIRC, 12, {0x86, 0x00}, "sonytv", "ch7"}, 
+   {SIRC, 12, {0x87, 0x00}, "sonytv", "ch8"}, 
+   {SIRC, 12, {0x88, 0x00}, "sonytv", "ch9"}, 
+   {SIRC, 12, {0x89, 0x00}, "sonytv", "ch10"}, 
+   {SIRC, 12, {0x8a, 0x00}, "sonytv", "ch11"}, 
+   {SIRC, 12, {0x8b, 0x00}, "sonytv", "ch12"}, 
+   {SIRC, 12, {0x8e, 0x00}, "sonytv", "epg"}, 
    {SIRC, 12, {0x90, 0x00}, "sonytv", "chnext"},  // cmd=10
    {SIRC, 12, {0x91, 0x00}, "sonytv", "chprev"},  // cmd=11
    {SIRC, 12, {0x92, 0x00}, "sonytv", "volup"},   // cmd=12
    {SIRC, 12, {0x93, 0x00}, "sonytv", "voldown"}, // cmd=13
    {SIRC, 12, {0x94, 0x00}, "sonytv", "mute"},    // cmd=14
    {SIRC, 12, {0x95, 0x00}, "sonytv", "power"},   // cmd=15
+   {SIRC, 12, {0xa5, 0x00}, "sonytv", "source"}, 
    {SIRC, 12, {0xe5, 0x00}, "sonytv", "ok"},      // cmd=65
    {SIRC, 12, {0xf4, 0x00}, "sonytv", "up"},      // cmd=74
    {SIRC, 12, {0xf5, 0x00}, "sonytv", "down"},    // cmd=75
