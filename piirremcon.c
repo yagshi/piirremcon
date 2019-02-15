@@ -339,15 +339,17 @@ int main(int argc, char *argv[])
     if (strcmp(PIIR_codedb[i].device, argv[1]) == 0 &&
 	strcmp(PIIR_codedb[i].command, argv[2]) == 0) {
       piir_transmit(PIIR_codedb[i]);
-      usleep(40000);
+      usleep(30000);
       piir_transmit(PIIR_codedb[i]);
-      usleep(40000);
+      usleep(30000);
       piir_transmit(PIIR_codedb[i]);
-      usleep(40000);
+      usleep(30000);
       piir_transmit(PIIR_codedb[i]);
-      usleep(40000);
+      usleep(30000);
       piir_transmit(PIIR_codedb[i]);
-      usleep(40000);
+      usleep(30000);
+      piir_transmit(PIIR_codedb[i]);
+      usleep(30000);
     }
   }
   return 0;
