@@ -23,4 +23,4 @@ for appliances.
   - EPSON projector
   - SONY Blu-ray player
 
-
+![raspberry pi zero](piirremconzero.jpg)
