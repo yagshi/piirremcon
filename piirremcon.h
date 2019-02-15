@@ -38,6 +38,16 @@ const struct IRCode PIIR_codedb[] =
    {SIRC, 12, {0x94, 0x00}, "sonytv", "mute"},    // cmd=14
    {SIRC, 12, {0x95, 0x00}, "sonytv", "power"},   // cmd=15
    {SIRC, 12, {0xa5, 0x00}, "sonytv", "source"}, 
+   {SIRC, 12, {0xae, 0x00}, "sonytv", "poweron"}, 
+   {SIRC, 12, {0xaf, 0x00}, "sonytv", "poweroff"}, 
+   {SIRC, 12, {0xb6, 0x00}, "sonytv", "sleeptimer"}, 
+   {SIRC, 12, {0xba, 0x00}, "sonytv", "info"}, 
+   {SIRC, 12, {0xbe, 0x00}, "sonytv", "blankscreen"}, 
+   {SIRC, 12, {0xc0, 0x00}, "sonytv", "component1"}, 
+   {SIRC, 12, {0xc1, 0x00}, "sonytv", "component2"}, 
+   {SIRC, 12, {0xdb, 0x00}, "sonytv", "pip"},     // picture in picture
+   {SIRC, 12, {0xe0, 0x00}, "sonytv", "home"},
+   {SIRC, 12, {0xe4, 0x00}, "sonytv", "pictureadjustment"},
    {SIRC, 12, {0xe5, 0x00}, "sonytv", "ok"},      // cmd=65
    {SIRC, 12, {0xf4, 0x00}, "sonytv", "up"},      // cmd=74
    {SIRC, 12, {0xf5, 0x00}, "sonytv", "down"},    // cmd=75
