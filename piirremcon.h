@@ -37,6 +37,7 @@ const struct IRCode PIIR_codedb[] =
    {SIRC, 12, {0x93, 0x00}, "sonytv", "voldown"}, // cmd=13
    {SIRC, 12, {0x94, 0x00}, "sonytv", "mute"},    // cmd=14
    {SIRC, 12, {0x95, 0x00}, "sonytv", "power"},   // cmd=15
+   {SIRC, 12, {0xa4, 0x00}, "sonytv", "tv"},      // tv
    {SIRC, 12, {0xa5, 0x00}, "sonytv", "source"}, 
    {SIRC, 12, {0xae, 0x00}, "sonytv", "poweron"}, 
    {SIRC, 12, {0xaf, 0x00}, "sonytv", "poweroff"}, 
@@ -53,6 +54,18 @@ const struct IRCode PIIR_codedb[] =
    {SIRC, 12, {0xf5, 0x00}, "sonytv", "down"},    // cmd=75
    {SIRC, 12, {0xb3, 0x00}, "sonytv", "right"},   // cmd=33
    {SIRC, 12, {0xb4, 0x00}, "sonytv", "left"},    // cmd=34
+   {SIRC, 15, {0x90, 0x4b}, "sonytv", "bscs"}, 
+   {SIRC, 15, {0x94, 0x4b}, "sonytv", "data"},
+   {SIRC, 15, {0xa0, 0x4b}, "sonytv", "rec"},
+   {SIRC, 15, {0xab, 0x4b}, "sonytv", "cs"},
+   {SIRC, 15, {0xac, 0x4b}, "sonytv", "bs"},
+   {SIRC, 15, {0xb2, 0x4b}, "sonytv", "digitaltv"},      // chijo digital TV
+   {SIRC, 15, {0xb6, 0x4b}, "sonytv", "displaysound"},  // display & sound 
+   {SIRC, 15, {0x46, 0x62}, "sonytv", "googleplay"}, 
+   {SIRC, 15, {0x47, 0x62}, "sonytv", "youtube"}, 
+   {SIRC, 15, {0x4b, 0x62}, "sonytv", "displaysound2"}, // same as 0xb64b ? 
+   {SIRC, 15, {0x4d, 0x62}, "sonytv", "help"},
+   {SIRC, 15, {0x4e, 0x62}, "sonytv", "skyperfectv"}, 
    // Blu-ray player (RMT-VB101J)
    {SIRC, 20, {0x15, 0x2d, 0x0e}, "sonybd", "power"}, // cmd=15
    {SIRC, 20, {0x1a, 0x2d, 0x0e}, "sonybd", "play"},
