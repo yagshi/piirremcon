@@ -13,16 +13,16 @@ for appliances.
 
   - No special library (libc 等の標準ライブラリのみで書かれています。極端なことを言うと、Raspberry pi以外の UN*X 系 OS であればコンパイルが通ります。)
 
-## Usage
+## How to use
 
 ### circuit
 
   - IR LED is controlled by BCM #14 (#8 of 40) pin.  You can cnange it 
     by editing `#define IR_LED 14` in `piirremcon.c`. (赤外LEDは
-	Raspberry Pi の (BCM 番号で) GPIO14番で制御します。1〜40の物理的な
-	ピン番号では8番です。)
+	Raspberry Pi の BCM 14番 (40Pの番号で8番) で制御します。
+    active high です。
 	
-  - The simplest connection is something like `BCM14(#8)--- A>K ---[68 ohm]--GND(#6 of 40)`. (一番単純な接続続方法は`BCM14(#8)--- A>K ---[68 ohm]--GND(#6 of 40)`です。
+  - The simplest connection is something like `BCM14(#8)--- A>K ---[68 ohm]--GND(#6 of 40)`. (一番単純な接続続方法は`BCM14(8番ピン)--- A>K ---[68 ohm]--GND(6番ピン)`です。)
   
   - If you need more power, you can make amplifier circuit like the picture in this page. (光量が必要なときは写真のような増幅回路を作ると良いと思います。)
 
