@@ -48,7 +48,6 @@ struct PIIRState {
   int led;
   unsigned int gpio_base;
   char *gpio_map;
-  char *gpio_mem;
   int mem_fd;
   volatile unsigned int *gpio;
 } gState;
@@ -62,7 +61,6 @@ struct PIIRState {
 void piir_transmitPatternAEHA(const unsigned char *pat, const int n_bits)
 {
   int t_us = 425;
-  int us;
   int us_next;
   int us_next2;
   int i, j, b;
@@ -116,7 +114,6 @@ void piir_transmitPatternAEHA(const unsigned char *pat, const int n_bits)
 void piir_transmitPatternNEC(const unsigned char *pat, const int n_bits)
 {
   int t_us = 562;
-  int us;
   int us_next;
   int us_next2;
   int i, j, b;
@@ -170,7 +167,6 @@ void piir_transmitPatternNEC(const unsigned char *pat, const int n_bits)
 void piir_transmitPatternSIRC(const unsigned char *pat, const int n_bits)
 {
   int t_us = 600;
-  int us;
   int us_next;
   int us_next2;
   int i, j, b;
@@ -252,20 +248,16 @@ int piir_initialize(int gpio_led, int pi_type)
   default:
     gState.gpio_base = PI2_PERI_BASE + 0x200000;
   }
-  if ((gState.mem_fd = open("/dev/mem", O_RDWR|O_SYNC)) < 0) return -1;
-  if ((gState.gpio_mem = (char*) malloc(BLOCK_SIZE + (PAGE_SIZE - 1))) == NULL)
-    return -1;
-  if ((unsigned long) gState.gpio_mem % PAGE_SIZE)
-    gState.gpio_mem += PAGE_SIZE - ((unsigned long) gState.gpio_mem % PAGE_SIZE);
+  if ((gState.mem_fd = open("/dev/mem", O_RDWR | O_SYNC)) < 0) return -1;
   gState.gpio_map = (char*) mmap(
-				 (void*) gState.gpio_mem,
+				 NULL,
 				 BLOCK_SIZE,
 				 PROT_READ | PROT_WRITE,
-				 MAP_SHARED | MAP_FIXED,
+				 MAP_SHARED,// | MAP_FIXED,
 				 gState.mem_fd,
 				 gState.gpio_base
 			  );
-  if ((long) gState.gpio_map < 0) return -1;
+  if (gState.gpio_map == MAP_FAILED) return -1;
   gState.gpio = (volatile unsigned int *) gState.gpio_map;
   INP_GPIO(gpio_led);
   OUT_GPIO(gpio_led);
