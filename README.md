@@ -41,5 +41,6 @@ $./piirremcon sharptv power
   - NEC projector
   - EPSON projector
   - SONY Blu-ray player
+  - Panasonic room light
 
 ![raspberry pi zero](piirremconzero.jpg)
