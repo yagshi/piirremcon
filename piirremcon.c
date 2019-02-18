@@ -20,14 +20,19 @@
 #define PI1_PERI_BASE 0x20000000  /* PI0, 1 */
 
 // set mode
-#define INP_GPIO(g) *(gState.gpio_map + ((g)/10)) &= ~(7<<(((g)%10)*3))
-#define OUT_GPIO(g) *(gState.gpio_map + ((g)/10)) |= (1<<(((g)%10)*3))
+#define INP_GPIO(g) *(volatile unsigned int*)(gState.gpio_map + ((g) / 10) * 4) &= ~(7 << (((g) % 10) * 3))
+#define OUT_GPIO(g) *(volatile unsigned int*)(gState.gpio_map + ((g) / 10) * 4) |= (1 << (((g) % 10) * 3))
 // do I/O
-#define GPIO_SET *(gState.gpio_map +  7)
-#define GPIO_CLR *(gState.gpio_map + 10)
-#define GPIO_GET *(gState.gpio_map + 13)
+#define GPIO_SET *(volatile unsigned int*)(gState.gpio_map + 0x1c)
+#define GPIO_CLR *(volatile unsigned int*)(gState.gpio_map + 0x28)
+#define GPIO_GET *(volatile unsigned int*)(gState.gpio_map + 0x34)
+#define IRQ1_ENABLE *(volatile unsigned int*)(gState.irq_map + 0x210)
+#define IRQ2_ENABLE *(volatile unsigned int*)(gState.irq_map + 0x214)
+#define IRQ3_ENABLE *(volatile unsigned int*)(gState.irq_map + 0x218)
+#define IRQ1_DISABLE *(volatile unsigned int*)(gState.irq_map + 0x21c)
+#define IRQ2_DISABLE *(volatile unsigned int*)(gState.irq_map + 0x220)
+#define IRQ3_DISABLE *(volatile unsigned int*)(gState.irq_map + 0x224)
 
-#define PAGE_SIZE  (4 * 1024)
 #define BLOCK_SIZE (4 * 1024)
 
 /* 起点時刻から us [us] 後まで待つ */
@@ -46,26 +51,27 @@ inline static int waitUs(struct timeval tv_zero, int until_us) {
 struct PIIRState {
   int led;
   unsigned int peri_base;
-  volatile unsigned int *gpio_map;
-  volatile unsigned int *irq_map;
+  volatile char *gpio_map;
+  volatile char *irq_map;
   int mem_fd;
 } gState;
 
 // 割り込み禁止 (割り込み情報を保存するための int[3] がいる)
 inline static void disableInterrupt(unsigned int irq_bits[3]) {
-  irq_bits[0] = *((volatile unsigned int *)(gState.irq_map + 0x210));
-  irq_bits[1] = *((volatile unsigned int *)(gState.irq_map + 0x214));
-  irq_bits[2] = *((volatile unsigned int *)(gState.irq_map + 0x218));
-  *((volatile unsigned int *)(gState.irq_map + 0x21c)) = 0xffffffff;
-  *((volatile unsigned int *)(gState.irq_map + 0x220)) = 0xffffffff;
-  *((volatile unsigned int *)(gState.irq_map + 0x224)) = 0xffffffff;
+unsigned int a,b,c;
+  irq_bits[0] = IRQ1_ENABLE;
+  irq_bits[1] = IRQ2_ENABLE;
+  irq_bits[2] = IRQ3_ENABLE;
+  IRQ1_DISABLE = 0xffffffff;
+  IRQ2_DISABLE = 0xffffffff;
+  IRQ3_DISABLE = 0xffffffff;
 }
 
 // 割り込み許可 (disable で保存した int[3] を渡す)
 inline static void enableInterrupt(unsigned int irq_bits[3]) {
-  *((volatile unsigned int *)(gState.irq_map + 0x210)) = irq_bits[0];
-  *((volatile unsigned int *)(gState.irq_map + 0x214)) = irq_bits[1];
-  *((volatile unsigned int *)(gState.irq_map + 0x218)) = irq_bits[2];
+  IRQ1_ENABLE = irq_bits[0];
+  IRQ2_ENABLE = irq_bits[1];
+  IRQ3_ENABLE = irq_bits[2];
 }
 
 /** 
@@ -282,7 +288,7 @@ int piir_initialize(int gpio_led, int pi_type)
 			PROT_READ | PROT_WRITE,
 			MAP_SHARED,
 			gState.mem_fd,
-			gState.peri_base + 0x00b000
+			gState.peri_base + 0xb000
 			);
   if (gState.gpio_map == MAP_FAILED || gState.irq_map == MAP_FAILED) return -1;
   INP_GPIO(gpio_led);
@@ -338,16 +344,10 @@ int main(int argc, char *argv[])
       piir_transmitPatternAEHA((const unsigned char *)data, (const int) atoi(argv[2]));
       usleep(40000);
       piir_transmitPatternAEHA((const unsigned char *)data, (const int) atoi(argv[2]));
-      usleep(40000);
-      piir_transmitPatternAEHA((const unsigned char *)data, (const int) atoi(argv[2]));
-      usleep(40000);
-      piir_transmitPatternAEHA((const unsigned char *)data, (const int) atoi(argv[2]));
       return 0;
   }
   if (strcmp("SIRC", argv[1]) == 0 && argc > 3) { // direct command
     parse_hex(data, argv[3], 9);
-    piir_transmitPatternSIRC((const unsigned char *)data, (const int) atoi(argv[2]));
-    usleep(40000);
     piir_transmitPatternSIRC((const unsigned char *)data, (const int) atoi(argv[2]));
     usleep(40000);
     piir_transmitPatternSIRC((const unsigned char *)data, (const int) atoi(argv[2]));
@@ -359,15 +359,6 @@ int main(int argc, char *argv[])
       piir_transmit(PIIR_codedb[i]);
       usleep(30000);
       piir_transmit(PIIR_codedb[i]);
-      usleep(30000);
-      piir_transmit(PIIR_codedb[i]);
-      usleep(30000);
-      piir_transmit(PIIR_codedb[i]);
-      usleep(30000);
-      piir_transmit(PIIR_codedb[i]);
-      usleep(30000);
-      piir_transmit(PIIR_codedb[i]);
-      usleep(30000);
     }
   }
   return 0;
