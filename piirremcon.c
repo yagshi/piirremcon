@@ -20,12 +20,12 @@
 #define PI1_PERI_BASE 0x20000000  /* PI0, 1 */
 
 // set mode
-#define INP_GPIO(g) *(gState.gpio + ((g)/10)) &= ~(7<<(((g)%10)*3))
-#define OUT_GPIO(g) *(gState.gpio + ((g)/10)) |= (1<<(((g)%10)*3))
+#define INP_GPIO(g) *(gState.gpio_map + ((g)/10)) &= ~(7<<(((g)%10)*3))
+#define OUT_GPIO(g) *(gState.gpio_map + ((g)/10)) |= (1<<(((g)%10)*3))
 // do I/O
-#define GPIO_SET *(gState.gpio +  7)
-#define GPIO_CLR *(gState.gpio + 10)
-#define GPIO_GET *(gState.gpio + 13)
+#define GPIO_SET *(gState.gpio_map +  7)
+#define GPIO_CLR *(gState.gpio_map + 10)
+#define GPIO_GET *(gState.gpio_map + 13)
 
 #define PAGE_SIZE  (4 * 1024)
 #define BLOCK_SIZE (4 * 1024)
@@ -43,14 +43,30 @@ inline static int waitUs(struct timeval tv_zero, int until_us) {
   return us;
 }
 
-
 struct PIIRState {
   int led;
-  unsigned int gpio_base;
-  char *gpio_map;
+  unsigned int peri_base;
+  volatile unsigned int *gpio_map;
+  volatile unsigned int *irq_map;
   int mem_fd;
-  volatile unsigned int *gpio;
 } gState;
+
+// 割り込み禁止 (割り込み情報を保存するための int[3] がいる)
+inline static void disableInterrupt(unsigned int irq_bits[3]) {
+  irq_bits[0] = *((volatile unsigned int *)(gState.irq_map + 0x210));
+  irq_bits[1] = *((volatile unsigned int *)(gState.irq_map + 0x214));
+  irq_bits[2] = *((volatile unsigned int *)(gState.irq_map + 0x218));
+  *((volatile unsigned int *)(gState.irq_map + 0x21c)) = 0xffffffff;
+  *((volatile unsigned int *)(gState.irq_map + 0x220)) = 0xffffffff;
+  *((volatile unsigned int *)(gState.irq_map + 0x224)) = 0xffffffff;
+}
+
+// 割り込み許可 (disable で保存した int[3] を渡す)
+inline static void enableInterrupt(unsigned int irq_bits[3]) {
+  *((volatile unsigned int *)(gState.irq_map + 0x210)) = irq_bits[0];
+  *((volatile unsigned int *)(gState.irq_map + 0x214)) = irq_bits[1];
+  *((volatile unsigned int *)(gState.irq_map + 0x218)) = irq_bits[2];
+}
 
 /** 
  *  @fn
@@ -216,6 +232,8 @@ void piir_transmitPatternSIRC(const unsigned char *pat, const int n_bits)
  */
 void piir_transmit(const struct IRCode code)
 {
+  unsigned int irq_bits[3];
+  disableInterrupt(irq_bits);
   switch (code.codetype) {
   case AEHA:
     piir_transmitPatternAEHA(code.data, code.length);
@@ -227,6 +245,7 @@ void piir_transmit(const struct IRCode code)
     piir_transmitPatternNEC(code.data, code.length);
     break;
   }
+  enableInterrupt(irq_bits);
 }
       
 /** 
@@ -241,24 +260,31 @@ int piir_initialize(int gpio_led, int pi_type)
   switch (pi_type) {
   case PIIR_TYPE_PI1:
   case PIIR_TYPE_PI0:
-    gState.gpio_base = PI1_PERI_BASE + 0x200000;
+    gState.peri_base = PI1_PERI_BASE;
     break;
   case PIIR_TYPE_PI3:
   case PIIR_TYPE_PI2:
   default:
-    gState.gpio_base = PI2_PERI_BASE + 0x200000;
+    gState.peri_base = PI2_PERI_BASE;
   }
   if ((gState.mem_fd = open("/dev/mem", O_RDWR | O_SYNC)) < 0) return -1;
-  gState.gpio_map = (char*) mmap(
-				 NULL,
-				 BLOCK_SIZE,
-				 PROT_READ | PROT_WRITE,
-				 MAP_SHARED,// | MAP_FIXED,
-				 gState.mem_fd,
-				 gState.gpio_base
-			  );
-  if (gState.gpio_map == MAP_FAILED) return -1;
-  gState.gpio = (volatile unsigned int *) gState.gpio_map;
+  gState.gpio_map = mmap(
+			 NULL,
+			 BLOCK_SIZE,
+			 PROT_READ | PROT_WRITE,
+			 MAP_SHARED,
+			 gState.mem_fd,
+			 gState.peri_base + 0x200000
+			 );
+  gState.irq_map = mmap(
+			NULL,
+			BLOCK_SIZE,
+			PROT_READ | PROT_WRITE,
+			MAP_SHARED,
+			gState.mem_fd,
+			gState.peri_base + 0x00b000
+			);
+  if (gState.gpio_map == MAP_FAILED || gState.irq_map == MAP_FAILED) return -1;
   INP_GPIO(gpio_led);
   OUT_GPIO(gpio_led);
   GPIO_CLR = 1 << gpio_led;
